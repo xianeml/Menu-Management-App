@@ -25,12 +25,14 @@
       </button>
     </div>
   </form>
-  <MenuItem :menus="menus" @reload-menu-list="initMenuList" />
+  <ul v-if="isLoaded" id="espresso-menu-list" class="mt-3 pl-0">
+    <MenuItem v-for="menu in menus" :key="menu.id" :menu="menu" @reload-menu-list="initMenuList" />
+  </ul>
 </template>
 
-<script>
+<script lang="ts">
 // TODO: 추후 ts, setup 적용
-import { ref } from '@vue/reactivity';
+import { ref, computed, onMounted } from 'vue';
 import MenuItem from './MenuItem.vue';
 import { getMenusAPI, createMenuAPI } from '@/api/menu.ts';
 export default {
@@ -38,48 +40,42 @@ export default {
     MenuItem,
   },
   setup() {
-    /* 반응형 data 선언 */
+    const category = ref('espresso');
+    const menus = ref([]);
+    const isLoaded = ref(false);
+
+    const menuCount = computed(() => menus.value.length);
+
+    const initMenuList = async () => {
+      const menuList = await getMenusAPI(category.value);
+      menus.value = menuList;
+      isLoaded.value = true;
+    };
+
+    onMounted(() => initMenuList());
+
     const newMenuName = ref('');
 
-    return { newMenuName };
-  },
-  data() {
-    return {
-      category: 'espresso',
-      menus: [],
-    };
-  },
-  computed: {
-    menuCount() {
-      return this.menus.length;
-    },
-  },
-  mounted() {
-    this.initMenuList();
-  },
-  methods: {
-    async initMenuList() {
-      const menuList = await getMenusAPI(this.category);
-      this.menus = menuList;
-    },
-    async addMenu() {
-      if (this.menus.length === 20) {
+    const addMenu = async () => {
+      if (menus.value.length === 20) {
         return alert('메뉴는 20개까지 추가 가능합니다.');
       }
-      if (!this.newMenuName) return;
+      if (!newMenuName.value) return;
       try {
         await createMenuAPI({
-          category: this.category,
-          name: this.newMenuName,
+          category: category.value,
+          name: newMenuName.value,
         });
       } catch (error) {
         // TODO: 커스텀 에러 객체 만들어서 message만 알림창에 표시하기
-        this.newMenuName = '';
+        newMenuName.value = '';
         return alert(error);
       }
-      this.newMenuName = '';
-      this.initMenuList();
-    },
+      newMenuName.value = '';
+      initMenuList();
+    };
+
+    return { newMenuName, menus, menuCount, isLoaded, addMenu, initMenuList };
   },
 };
 </script>
