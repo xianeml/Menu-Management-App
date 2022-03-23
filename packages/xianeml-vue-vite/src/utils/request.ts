@@ -1,6 +1,6 @@
-import { SERVER_URL } from '../utils/constants/env.js';
-import { TmenuResponse, TrequestConfig } from '../types/api.js';
-import { Tmenu } from '../types/store.js';
+import { SERVER_URL } from '@/constants/env.js';
+import { TmenuResponse, TrequestConfig } from '@/types/api.js';
+import { Tmenu } from '@/types/store.js';
 
 export default async (config: TrequestConfig) => {
   const { url, method, data } = config;
