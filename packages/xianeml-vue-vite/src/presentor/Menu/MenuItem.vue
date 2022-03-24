@@ -25,7 +25,6 @@
 </template>
 
 <script lang="ts">
-// TODO: 추후 ts, setup 적용
 import { modifyMenuAPI, soldOutMenuAPI, deleteMenuAPI } from '@/api/menu.ts';
 
 export default {
@@ -45,12 +44,12 @@ export default {
   setup(props, { emit }) {
     const soldOutMenu = async (menuId: string, inStock: boolean) => {
       if (!confirm(`메뉴를 ${inStock ? '품절' : '입고'} 처리하시겠습니까?`)) return;
-      const params = {
+      const payload = {
         category: props.category,
         menuId,
       };
       try {
-        await soldOutMenuAPI(params);
+        await soldOutMenuAPI(payload);
       } catch (error) {
         return alert(error);
       }
@@ -60,13 +59,13 @@ export default {
     const modifyMenu = async (menuId: string) => {
       const newMenuName = prompt('수정할 메뉴명을 입력하세요.')?.trim();
       if (!newMenuName) return;
-      const params = {
+      const payload = {
         category: props.category,
         menuId,
         name: newMenuName || '',
       };
       try {
-        await modifyMenuAPI(params);
+        await modifyMenuAPI(payload);
       } catch (error) {
         return alert(error);
       }
@@ -75,12 +74,12 @@ export default {
 
     const deleteMenu = async (menuId: string) => {
       if (!confirm('메뉴를 삭제하시겠습니까?')) return;
-      const params = {
+      const payload = {
         category: props.category,
         menuId,
       };
       try {
-        await deleteMenuAPI(params);
+        await deleteMenuAPI(payload);
       } catch (error) {
         return alert(error);
       }
